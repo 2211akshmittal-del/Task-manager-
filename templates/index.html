@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ TaskFlow Pro — Ultimate Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- ============== SIDEBAR (ChatGPT Style) ============== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>TaskFlow</h1>
+                    <span>Pro</span>
+                </div>
+            </div>
+            <button class="new-task-btn" id="newTaskBtn">
+                <i class="fas fa-plus"></i>
+                <span>New Task</span>
+            </button>
+        </div>
+
+        <div class="sidebar-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="globalSearch" placeholder="Search tasks...">
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <p class="nav-label">Workspace</p>
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-view="inbox">
+                    <i class="fas fa-inbox"></i>
+                    <span>Inbox</span>
+                    <span class="nav-count" id="inboxCount">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="today">
+                    <i class="fas fa-sun"></i>
+                    <span>Today</span>
+                    <span class="nav-count" id="todayCount">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="upcoming">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>Upcoming</span>
+                    <span class="nav-count" id="upcomingCount">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="overdue">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Overdue</span>
+                    <span class="nav-count danger" id="overdueCount">0</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <p class="nav-label">Status</p>
+                <a href="#" class="nav-item" data-view="todo">
+                    <i class="fas fa-circle"></i>
+                    <span>To Do</span>
+                    <span class="nav-count" id="todoCount">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="in_progress">
+                    <i class="fas fa-spinner"></i>
+                    <span>In Progress</span>
+                    <span class="nav-count" id="progressCount">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="review">
+                    <i class="fas fa-eye"></i>
+                    <span>In Review</span>
+                    <span class="nav-count" id="reviewCount">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="done">
+                    <i class="fas fa-check-double"></i>
+                    <span>Completed</span>
+                    <span class="nav-count success" id="doneCount">0</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <p class="nav-label">Categories</p>
+                <a href="#" class="nav-item" data-category="Work">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Work</span>
+                </a>
+                <a href="#" class="nav-item" data-category="Personal">
+                    <i class="fas fa-home"></i>
+                    <span>Personal</span>
+                </a>
+                <a href="#" class="nav-item" data-category="Study">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Study</span>
+                </a>
+                <a href="#" class="nav-item" data-category="Health">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Health</span>
+                </a>
+                <a href="#" class="nav-item" data-category="Shopping">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Shopping</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <p class="nav-label">More</p>
+                <a href="#" class="nav-item" data-view="pinned">
+                    <i class="fas fa-thumbtack"></i>
+                    <span>Pinned</span>
+                </a>
+                <a href="#" class="nav-item" data-view="archived">
+                    <i class="fas fa-archive"></i>
+                    <span>Archived</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">U</div>
+                <div class="user-info">
+                    <p class="user-name">User</p>
+                    <p class="user-plan">Pro Plan ✨</p>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============== MAIN CONTENT ============== -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="viewTitle">Dashboard</h2>
+                <p id="viewSubtitle">Welcome back! Here's your productivity overview</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" id="kanbanBtn" title="Kanban View">
+                    <i class="fas fa-columns"></i>
+                </button>
+                <button class="topbar-btn active" id="listBtn" title="List View">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="topbar-btn" id="gridBtn" title="Grid View">
+                    <i class="fas fa-th"></i>
+                </button>
+                <div class="topbar-divider"></div>
+                <button class="topbar-btn" id="filterBtn" title="Filters">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- View: Dashboard -->
+        <div class="view" id="dashboardView">
+            <div class="stats-grid">
+                <div class="stat-card stat-primary">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 12%</span>
+                    </div>
+                    <h3 id="statTotal">0</h3>
+                    <p>Total Tasks</p>
+                </div>
+                <div class="stat-card stat-success">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-check"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 8%</span>
+                    </div>
+                    <h3 id="statCompleted">0</h3>
+                    <p>Completed</p>
+                </div>
+                <div class="stat-card stat-warning">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <span class="stat-trend"><i class="fas fa-minus"></i> 2%</span>
+                    </div>
+                    <h3 id="statPending">0</h3>
+                    <p>Pending</p>
+                </div>
+                <div class="stat-card stat-danger">
+                    <div class="stat-header">
+                        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                        <span class="stat-trend down"><i class="fas fa-arrow-down"></i> 5%</span>
+                    </div>
+                    <h3 id="statOverdue">0</h3>
+                    <p>Overdue</p>
+                </div>
+            </div>
+
+            <div class="dashboard-row">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Task Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categoryChart" width="200" height="200"></canvas>
+                        <div class="chart-legend" id="chartLegend"></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-trophy"></i> Today's Focus</h3>
+                    </div>
+                    <div class="focus-list" id="todayFocus"></div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action" data-category="Work">
+                        <i class="fas fa-briefcase"></i>
+                        <span>New Work Task</span>
+                    </button>
+                    <button class="quick-action" data-category="Personal">
+                        <i class="fas fa-home"></i>
+                        <span>Personal Task</span>
+                    </button>
+                    <button class="quick-action" data-category="Study">
+                        <i class="fas fa-book"></i>
+                        <span>Study Task</span>
+                    </button>
+                    <button class="quick-action" data-category="Health">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Health Task</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Task Lists -->
+        <div class="view hidden" id="tasksView">
+            <!-- Filters Bar -->
+            <div class="filter-bar">
+                <div class="filter-chips">
+                    <button class="chip active" data-priority="all">All</button>
+                    <button class="chip" data-priority="High">🔴 High</button>
+                    <button class="chip" data-priority="Medium">🟡 Medium</button>
+                    <button class="chip" data-priority="Low">🟢 Low</button>
+                </div>
+                <div class="sort-dropdown">
+                    <select id="sortSelect">
+                        <option value="created">📅 Created Date</option>
+                        <option value="due">⏰ Due Date</option>
+                        <option value="priority">🎯 Priority</option>
+                        <option value="title">🔤 Title</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tasks Container -->
+            <div class="tasks-container" id="tasksContainer"></div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3>No tasks here</h3>
+                <p>Click "New Task" to create your first one</p>
+                <button class="btn-primary" id="emptyStateBtn">
+                    <i class="fas fa-plus"></i> Create Task
+                </button>
+            </div>
+        </div>
+
+        <!-- View: Kanban -->
+        <div class="view hidden" id="kanbanView">
+            <div class="kanban-board">
+                <div class="kanban-column" data-status="todo">
+                    <div class="kanban-header">
+                        <h4><i class="fas fa-circle"></i> To Do</h4>
+                        <span class="kanban-count" id="kanbanTodoCount">0</span>
+                    </div>
+                    <div class="kanban-cards" id="kanbanTodo"></div>
+                </div>
+                <div class="kanban-column" data-status="in_progress">
+                    <div class="kanban-header">
+                        <h4><i class="fas fa-spinner"></i> In Progress</h4>
+                        <span class="kanban-count" id="kanbanProgressCount">0</span>
+                    </div>
+                    <div class="kanban-cards" id="kanbanProgress"></div>
+                </div>
+                <div class="kanban-column" data-status="review">
+                    <div class="kanban-header">
+                        <h4><i class="fas fa-eye"></i> In Review</h4>
+                        <span class="kanban-count" id="kanbanReviewCount">0</span>
+                    </div>
+                    <div class="kanban-cards" id="kanbanReview"></div>
+                </div>
+                <div class="kanban-column" data-status="done">
+                    <div class="kanban-header">
+                        <h4><i class="fas fa-check-double"></i> Done</h4>
+                        <span class="kanban-count" id="kanbanDoneCount">0</span>
+                    </div>
+                    <div class="kanban-cards" id="kanbanDone"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============== TASK MODAL ============== -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="fas fa-plus-circle"></i> Create New Task</h2>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="taskForm" class="modal-body">
+                <input type="hidden" id="taskId">
+
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Title *</label>
+                    <input type="text" id="title" placeholder="What needs to be done?" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-align-left"></i> Description</label>
+                    <textarea id="description" rows="3" placeholder="Add more details..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-folder"></i> Category</label>
+                        <select id="category">
+                            <option value="General">📁 General</option>
+                            <option value="Work">💼 Work</option>
+                            <option value="Personal">🏠 Personal</option>
+                            <option value="Study">📚 Study</option>
+                            <option value="Health">💪 Health</option>
+                            <option value="Shopping">🛒 Shopping</option>
+                            <option value="Urgent">🚨 Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-flag"></i> Priority</label>
+                        <select id="priority">
+                            <option value="Low">🟢 Low</option>
+                            <option value="Medium" selected>🟡 Medium</option>
+                            <option value="High">🔴 High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Due Date</label>
+                        <input type="date" id="due_date">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-bell"></i> Reminder</label>
+                        <input type="time" id="reminder">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-stream"></i> Status</label>
+                        <select id="status">
+                            <option value="todo">To Do</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="review">In Review</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-hourglass-half"></i> Estimated Time (min)</label>
+                        <input type="number" id="estimated_time" placeholder="30" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-tags"></i> Tags (comma separated)</label>
+                    <input type="text" id="tags" placeholder="urgent, client, project-x">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-palette"></i> Color Label</label>
+                    <div class="color-picker">
+                        <label class="color-option"><input type="radio" name="color" value="blue" checked><span class="color-dot blue"></span></label>
+                        <label class="color-option"><input type="radio" name="color" value="cyan"><span class="color-dot cyan"></span></label>
+                        <label class="color-option"><input type="radio" name="color" value="purple"><span class="color-dot purple"></span></label>
+                        <label class="color-option"><input type="radio" name="color" value="green"><span class="color-dot green"></span></label>
+                        <label class="color-option"><input type="radio" name="color" value="orange"><span class="color-dot orange"></span></label>
+                        <label class="color-option"><input type="radio" name="color" value="red"><span class="color-dot red"></span></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-list-ul"></i> Subtasks</label>
+                    <div class="subtask-input">
+                        <input type="text" id="newSubtask" placeholder="Add a subtask...">
+                        <button type="button" id="addSubtaskBtn" class="btn-icon">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="subtasks-list" id="subtasksList"></div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note"></i> Notes</label>
+                    <textarea id="notes" rows="2" placeholder="Additional notes..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="pinned">
+                        <span><i class="fas fa-thumbtack"></i> Pin to top</span>
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> Save Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============== TASK DETAIL SIDEBAR ============== -->
+    
+    <!-- ============== TOAST ============== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============== CONFIRM DIALOG ============== -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="confirm-dialog">
+            <div class="confirm-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="confirmTitle">Are you sure?</h3>
+            <p id="confirmMessage">This action cannot be undone.</p>
+            <div class="confirm-actions">
+                <button class="btn-secondary" id="confirmCancel">Cancel</button>
+                <button class="btn-danger" id="confirmOk">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
